@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Key Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>License Key Generator</h1>
+        <div class="card">
+            <div class="form-group">
+                <label for="hwid">Hardware ID (HWID):</label>
+                <input type="text" id="hwid" placeholder="Enter your Hardware ID">
+            </div>
+            <div class="button-group">
+                <button id="generateBtn">Generate Activation Code</button>
+            </div>
+            <div class="result-group">
+                <label for="activationCode">Activation Code:</label>
+                <div class="code-display">
+                    <input type="text" id="activationCode" readonly>
+                    <button id="copyBtn">Copy</button>
+                </div>
+            </div>
+        </div>
+        <div class="info-section">
+            <h2>How to Use</h2>
+            <ol>
+                <li>Enter your Hardware ID in the input field</li>
+                <li>Click "Generate Activation Code"</li>
+                <li>Use the generated code to activate your software</li>
+            </ol>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2023 License Key Generator. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
