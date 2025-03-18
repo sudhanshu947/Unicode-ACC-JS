@@ -5,9 +5,15 @@
         { "src": "public/**/*", "use": "@vercel/static" },
         { "src": "api/*.js", "use": "@vercel/node" }
     ],
-    "routes": [
-        { "src": "/api/(.*)", "dest": "/api/$1" },
-        { "src": "/(.*)", "dest": "/public/$1" }
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "/api/$1"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/$1"
+        }
     ],
     "headers": [
         {
@@ -28,6 +34,23 @@
                 {
                     "key": "Content-Security-Policy",
                     "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;"
+                }
+            ]
+        },
+        {
+            "source": "/api/(.*)",
+            "headers": [
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "*"
+                },
+                {
+                    "key": "Access-Control-Allow-Methods",
+                    "value": "GET, POST, PUT, DELETE, OPTIONS"
+                },
+                {
+                    "key": "Access-Control-Allow-Headers",
+                    "value": "X-Requested-With, Content-Type, Accept"
                 }
             ]
         }
