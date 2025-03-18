@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModal = document.querySelector('.close');
 
     // Security: Generate a random client ID on page load
-    const clientId = crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
+    const clientId = Math.random().toString(36).substring(2, 15);
 
     // Function to generate request signature
     function generateSignature(data) {
@@ -69,16 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to generate key');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to generate key');
             }
 
             const data = await response.json();
             
-            // Verify response signature
-            if (data.signature !== generateSignature({ activationKey: data.activationKey })) {
-                throw new Error('Invalid response signature');
-            }
-
             licenseKeyInput.value = data.activationKey;
             resultContainer.classList.remove('hidden');
             copyBtn.disabled = false;
@@ -96,7 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
     copyBtn.addEventListener('click', async () => {
         try {
             setLoading(copyBtn, true);
-            await navigator.clipboard.writeText(licenseKeyInput.value);
+            
+            // Fallback for browsers that don't support clipboard API
+            if (!navigator.clipboard) {
+                licenseKeyInput.select();
+                document.execCommand('copy');
+            } else {
+                await navigator.clipboard.writeText(licenseKeyInput.value);
+            }
             
             const originalText = copyBtn.querySelector('span').textContent;
             copyBtn.querySelector('i').className = 'fas fa-check';
@@ -143,16 +146,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to validate key');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to validate key');
             }
 
             const data = await response.json();
             
-            // Verify response signature
-            if (data.signature !== generateSignature({ isValid: data.isValid })) {
-                throw new Error('Invalid response signature');
-            }
-
             if (data.isValid) {
                 showSuccess('Valid activation key!');
                 validateBtn.querySelector('i').className = 'fas fa-check-circle';

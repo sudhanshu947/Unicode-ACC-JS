@@ -2,6 +2,7 @@
     "name": "license-key-generator",
     "version": "1.0.0",
     "description": "A secure license key generator with server-side API",
+    "type": "module",
     "main": "index.js",
     "scripts": {
       "dev": "vercel dev",
@@ -15,10 +16,7 @@
     ],
     "author": "",
     "license": "MIT",
-    "dependencies": {
-      "crypto": "^1.0.1"
-    },
-    "devDependencies": {
-      "vercel": "^32.7.2"
+    "engines": {
+      "node": ">=18.x"
     }
   }
