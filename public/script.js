@@ -12,6 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const aboutModal = document.getElementById('aboutModal');
     const closeModal = document.querySelector('.close');
 
+    // Security: Generate a random client ID on page load
+    const clientId = crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
+
+    // Function to generate request signature
+    function generateSignature(data) {
+        // This is a simplified version - in production, use a more secure method
+        const timestamp = Date.now();
+        const stringToSign = JSON.stringify(data) + timestamp + clientId;
+        return btoa(stringToSign);
+    }
+
     // Add loading state to buttons
     function setLoading(button, isLoading) {
         const icon = button.querySelector('i');
@@ -44,22 +55,34 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Show loading state
         setLoading(generateBtn, true);
 
         try {
-            // Simulate processing delay
-            await new Promise(resolve => setTimeout(resolve, 500));
+            const signature = generateSignature({ hwid });
+            const response = await fetch('/api/generateKey', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Client-ID': clientId
+                },
+                body: JSON.stringify({ hwid, signature })
+            });
 
-            const activationKey = calculateActId(hwid);
-            licenseKeyInput.value = activationKey;
+            if (!response.ok) {
+                throw new Error('Failed to generate key');
+            }
+
+            const data = await response.json();
+            
+            // Verify response signature
+            if (data.signature !== generateSignature({ activationKey: data.activationKey })) {
+                throw new Error('Invalid response signature');
+            }
+
+            licenseKeyInput.value = data.activationKey;
             resultContainer.classList.remove('hidden');
             copyBtn.disabled = false;
-            
-            // Auto-fill validation input
-            validateInput.value = activationKey;
-
-            // Show success message
+            validateInput.value = data.activationKey;
             showSuccess('Key generated successfully!');
         } catch (error) {
             showError('An error occurred while generating the key.');
@@ -75,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setLoading(copyBtn, true);
             await navigator.clipboard.writeText(licenseKeyInput.value);
             
-            // Show success feedback
             const originalText = copyBtn.querySelector('span').textContent;
             copyBtn.querySelector('i').className = 'fas fa-check';
             copyBtn.querySelector('span').textContent = 'Copied!';
@@ -110,13 +132,28 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(validateBtn, true);
 
         try {
-            // Simulate processing delay
-            await new Promise(resolve => setTimeout(resolve, 300));
+            const signature = generateSignature({ hwid, keyToValidate });
+            const response = await fetch('/api/validateKey', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Client-ID': clientId
+                },
+                body: JSON.stringify({ hwid, keyToValidate, signature })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to validate key');
+            }
+
+            const data = await response.json();
             
-            const calculatedKey = calculateActId(hwid);
-            const isValid = parseInt(keyToValidate) === calculatedKey;
-            
-            if (isValid) {
+            // Verify response signature
+            if (data.signature !== generateSignature({ isValid: data.isValid })) {
+                throw new Error('Invalid response signature');
+            }
+
+            if (data.isValid) {
                 showSuccess('Valid activation key!');
                 validateBtn.querySelector('i').className = 'fas fa-check-circle';
             } else {
@@ -150,34 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Function to calculate activation ID based on HWID
-    function calculateActId(sysId) {
-        sysId = sysId.trim();
-        const t = sysId.length;
-        let tot = 0;
-
-        // Loop over each character in the sysId
-        for (let z = 0; z < t; z++) {
-            // Convert the character to a digit (or 0 if not a digit)
-            const digit = parseInt(sysId[z]) || 0;
-            tot += digit + 79;
-        }
-
-        // Extract last 5 characters as a number
-        const substringStart = Math.max(0, t - 5);
-        const substringPart = sysId.substring(substringStart);
-        const valueFromSubstring = parseInt(substringPart) || 0;
-        tot += valueFromSubstring;
-
-        // Calculate ACT_ID using the formula:
-        // ACT_ID = int(sqrt(tot) * (Year(current date) + 1)) + Day(current date)
-        const sqrtTot = Math.sqrt(tot);
-        const yearFactor = new Date().getFullYear() + 1;
-        const actId = Math.floor(sqrtTot * yearFactor) + new Date().getDate();
-
-        return actId;
-    }
-
     // Function to show error message
     function showError(message) {
         validationResult.textContent = message;
@@ -194,12 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add input validation
     hwidInput.addEventListener('input', (e) => {
-        // Remove any non-numeric characters
         e.target.value = e.target.value.replace(/[^0-9]/g, '');
     });
 
     validateInput.addEventListener('input', (e) => {
-        // Remove any non-numeric characters
         e.target.value = e.target.value.replace(/[^0-9]/g, '');
     });
 });
