@@ -1,4 +1,7 @@
+ // Simple License Key Generator
 document.addEventListener('DOMContentLoaded', () => {
+    'use strict';
+
     // Get DOM elements
     const hwidInput = document.getElementById('hwid');
     const activationCodeInput = document.getElementById('activationCode');
@@ -9,7 +12,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const aboutModal = document.getElementById('aboutModal');
     const closeModalBtns = document.querySelectorAll('.close');
 
-    // Generate key when the button is clicked
+    // Calculate activation ID
+    function calculateActId(sysId) {
+        if (!sysId || !sysId.trim()) return 0;
+        
+        try {
+            sysId = sysId.trim();
+            const length = sysId.length;
+            let total = 0;
+
+            // Calculate total based on system ID
+            for (let i = 0; i < length; i++) {
+                const digit = parseInt(sysId[i]) || 0;
+                total += digit + 79;
+            }
+
+            // Add value from last 5 characters
+            const substringStart = Math.max(0, length - 5);
+            const substringPart = sysId.substring(substringStart);
+            const valueFromSubstring = parseInt(substringPart) || 0;
+            total += valueFromSubstring;
+
+            // Generate activation ID
+            const yearFactor = new Date().getFullYear() + 1;
+            return Math.floor(Math.sqrt(total) * yearFactor) + new Date().getDate();
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    // Show message with timeout
+    function showMessage(message, type) {
+        validationResult.textContent = message;
+        validationResult.className = 'message ' + type;
+        resultContainer.style.display = 'block';
+        
+        setTimeout(() => {
+            validationResult.textContent = '';
+            resultContainer.style.display = 'none';
+        }, 5000);
+    }
+
+    // Generate button click handler
     generateBtn.addEventListener('click', () => {
         const hwid = hwidInput.value.trim();
         if (!hwid) {
@@ -19,67 +63,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const activationCode = calculateActId(hwid);
         activationCodeInput.value = activationCode;
-        
         showMessage('License key generated successfully.', 'success');
     });
 
-    // About link functionality
+    // About modal functionality
     aboutLink.addEventListener('click', (e) => {
         e.preventDefault();
         aboutModal.style.display = 'block';
     });
 
-    // Close modal buttons
+    // Close modal functionality
     closeModalBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             aboutModal.style.display = 'none';
         });
     });
 
-    // Close modals when clicking outside
+    // Close modal when clicking outside
     window.addEventListener('click', (e) => {
         if (e.target === aboutModal) {
             aboutModal.style.display = 'none';
         }
     });
 
-    // Function to calculate activation ID based on HWID
-    function calculateActId(sysId) {
-        if (!sysId.trim()) {
-            return 0;
+    // Security measures
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey && e.shiftKey && e.key === 'I') || 
+            (e.ctrlKey && e.shiftKey && e.key === 'J') || 
+            (e.ctrlKey && e.key === 'U')) {
+            e.preventDefault();
         }
-        
-        // Trim whitespace
-        sysId = sysId.trim();
-        const t = sysId.length;
-        let tot = 0;
+    });
 
-        // Loop over each character in the sysId
-        for (let z = 0; z < t; z++) {
-            // Convert the character to a digit (or 0 if not a digit)
-            const digit = parseInt(sysId[z]) || 0;
-            tot += digit + 79;
-        }
-
-        // Extract substring (last 5 characters)
-        const substringStart = Math.max(0, t - 5);
-        const substringPart = sysId.substring(substringStart);
-        const valueFromSubstring = parseInt(substringPart) || 0;
-        tot += valueFromSubstring;
-
-        // Calculate ACT_ID using the formula:
-        // ACT_ID = int(sqrt(tot) * (Year(current date) + 1)) + Day(current date)
-        const sqrtTot = Math.sqrt(tot);
-        const yearFactor = new Date().getFullYear() + 1;
-        const actId = Math.floor(sqrtTot * yearFactor) + new Date().getDate();
-
-        return actId;
-    }
-
-    // Function to show message
-    function showMessage(message, type) {
-        validationResult.textContent = message;
-        validationResult.className = 'message ' + type;
-        resultContainer.style.display = 'block';
-    }
+    // Prevent copy/paste on activation code
+    activationCodeInput.addEventListener('copy', e => e.preventDefault());
+    activationCodeInput.addEventListener('cut', e => e.preventDefault());
 });
