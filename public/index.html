@@ -6,83 +6,46 @@
     <title>License Key Generator</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+
     <div class="container">
         <div class="glass-card">
-            <div class="card-header">
-                <h1><i class="fas fa-key"></i> License Key Generator</h1>
-                <p>Generate an activation key using your Hardware ID</p>
+            <h1>🔑 License Key Generator</h1>
+            <p>Generate License Key</p>
+
+            <div class="input-group">
+                <label for="hwid">Hardware ID (HWID)</label>
+                <input type="text" id="hwid" placeholder="Enter your hardware ID">
             </div>
 
-            <div class="card-body">
-                <div class="input-group">
-                    <label for="hwid">Hardware ID (HWID)</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-fingerprint"></i>
-                        <input type="text" id="hwid" placeholder="Enter your HWID" autocomplete="off">
-                    </div>
-                </div>
-
-                <div class="btn-group">
-                    <button id="generateBtn" class="btn primary">
-                        <i class="fas fa-cog"></i>
-                        <span>Generate Key</span>
-                    </button>
-                    <button id="copyBtn" class="btn secondary" disabled>
-                        <i class="fas fa-copy"></i>
-                        <span>Copy Key</span>
-                    </button>
-                </div>
-
-                <div class="result hidden" id="resultContainer">
-                    <div class="input-group">
-                        <label for="licenseKey">Generated Key</label>
-                        <div class="input-wrapper">
-                            <i class="fas fa-key"></i>
-                            <input type="text" id="licenseKey" readonly>
-                        </div>
-                    </div>
-
-                    <div class="validation">
-                        <div class="input-group">
-                            <label for="validateInput">Validate Key</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-check-circle"></i>
-                                <input type="text" id="validateInput" placeholder="Enter key to validate">
-                            </div>
-                        </div>
-                        <button id="validateBtn" class="btn success">
-                            <i class="fas fa-check"></i>
-                            <span>Validate</span>
-                        </button>
-                        <div id="validationResult" class="message"></div>
-                    </div>
-                </div>
+            <div class="input-group">
+                <label for="activationCode">Generated Key</label>
+                <input type="text" id="activationCode" readonly placeholder="Your key will appear here">
             </div>
 
-            <div class="card-footer">
-                <p>© 2024 License Key Generator | <a href="#" id="aboutLink">About</a></p>
+            <div class="btn-group">
+                <button id="generateBtn" class="btn primary">Generate Key</button>
+            </div>
+
+            <div class="result" id="resultContainer">
+                <div id="validationResult" class="message"></div>
+            </div>
+
+            <div class="footer">
+                <p>© 2025 License Key Generator | <a href="#" id="aboutLink">About</a></p>
             </div>
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal for About -->
     <div id="aboutModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2><i class="fas fa-info-circle"></i> About License Key Generator</h2>
-            <div class="modal-body">
-                <p>This tool securely generates activation keys based on your Hardware ID using a proprietary algorithm.</p>
-                <p>Each key is unique to your system and includes:</p>
-                <ul>
-                    <li>Hardware-specific validation</li>
-                    <li>Time-based encryption</li>
-                    <li>Secure key generation</li>
-                </ul>
-                <p>For support, contact: <a href="mailto:support@example.com">support@example.com</a></p>
-            </div>
+            <h2>About License Key Generator</h2>
+            <p>This tool securely generates license keys based on your Hardware ID.</p>
+            <p>The key is specific to your system and the current year.</p>
+            <p>For support, contact: <a href="mailto:support@example.com">support@example.com</a></p>
         </div>
     </div>
 
