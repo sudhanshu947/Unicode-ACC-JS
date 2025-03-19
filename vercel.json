@@ -4,11 +4,10 @@
     "builds": [
       { "src": "public/**", "use": "@vercel/static" }
     ],
-    "routes": [
-      { "src": "/(.*)", "dest": "/public/$1" },
-      { "handle": "filesystem" },
-      { "src": "/.*", "dest": "/public/index.html" }
+    "rewrites": [
+      { "source": "/(.*)", "destination": "/public/$1" }
     ],
+    "cleanUrls": true,
     "github": {
       "silent": true
     },
